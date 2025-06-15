@@ -11,6 +11,11 @@
       - 1.id.pool.ntp.org
 
   tasks:
+    - name: Install EPEL release
+      dnf:
+        name: epel-release
+        state: present
+
     - name: Update sistem dan install paket dasar
       dnf:
         name:
