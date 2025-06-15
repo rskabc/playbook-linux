@@ -16,7 +16,7 @@ setupserver.yml
 
 ### ✅ Install Paket
 - `htop`, `nano`, `tree`, `curl`, `wget`, `zip`, `unzip`, `git`, `yum-utils`
-- `net-tools`, `bind-utils`, `traceroute`, `snmp`, `chrony`, `bash-completion`
+- `net-tools`, `bind-utils`, `traceroute`, `snmp`, `chrony`, `bash-completion`, `EPEL`
 
 ### 🔐 Konfigurasi SNMP (v2c)
 - Community: `public`
