@@ -1,41 +1,33 @@
-# 🚀 AlmaLinux Server Setup Script (`setupserver.sh`)
+# 🚀 Ansible Playbook: Setup Server AlmaLinux
 
-Shell script ini digunakan untuk melakukan instalasi dan konfigurasi awal pada sistem **AlmaLinux**, cocok untuk provisioning server baru sebelum digunakan untuk keperluan produksi atau otomatisasi.
+Playbook ini digunakan untuk otomatisasi setup awal server berbasis **AlmaLinux**, meliputi instalasi paket utilitas, konfigurasi SNMP, NTP lokal Indonesia, dan banner keamanan SSH.
 
 ---
 
 ## 📁 Nama File
 
 ```bash
-setupserver.sh
+setupserver.yml
 ```
 
 ---
 
-## 📦 Paket yang Diinstal
+## 📦 Fitur yang Dilakukan oleh Playbook
 
-| Kategori       | Paket                                                                           |
-|----------------|----------------------------------------------------------------------------------|
-| Sistem         | `htop`, `nano`, `tree`, `curl`, `wget`, `unzip`, `zip`, `git`, `yum-utils`      |
-| Jaringan       | `net-tools`, `bind-utils`, `traceroute`, `snmp`, `chrony`                       |
-| Shell/Terminal | `bash-completion`                                                               |
+### ✅ Install Paket
+- `htop`, `nano`, `tree`, `curl`, `wget`, `zip`, `unzip`, `git`, `yum-utils`
+- `net-tools`, `bind-utils`, `traceroute`, `snmp`, `chrony`, `bash-completion`
 
----
-
-## ⚙️ Konfigurasi Otomatis
-
-### 🔐 SNMP v2c
+### 🔐 Konfigurasi SNMP (v2c)
 - Community: `public`
 - Lokasi: `Jakarta, Indonesia`
 - Kontak: `reski.abuchaer@gmail.com`
 
-### ⏰ NTP (Chrony)
-- Server lokal Indonesia:
-  - `0.id.pool.ntp.org`
-  - `1.id.pool.ntp.org`
+### ⏰ Konfigurasi NTP (Chrony)
+- Server: `0.id.pool.ntp.org`, `1.id.pool.ntp.org`
 
-### 🔐 SSH Banner
-Menampilkan pesan peringatan saat login melalui SSH:
+### 📢 Konfigurasi SSH Banner
+Menampilkan peringatan saat user login ke SSH:
 ```
 Peringatan: Akses ke sistem ini diawasi. Segala aktivitas Anda dapat dicatat dan diaudit.
 Jika Anda tidak berwenang, segera keluar dari sistem ini.
@@ -43,33 +35,30 @@ Jika Anda tidak berwenang, segera keluar dari sistem ini.
 
 ---
 
-## ▶️ Cara Penggunaan
+## ▶️ Cara Menjalankan
 
-1. **Download & beri izin eksekusi:**
-
-```bash
-wget https://path-ke-script/setupserver.sh
-chmod +x setupserver.sh
+1. Buat inventori misalnya `inventory.ini`:
+```ini
+[almalinux]
+192.168.1.100 ansible_user=root
 ```
 
-2. **Jalankan sebagai root:**
-
+2. Jalankan playbook:
 ```bash
-sudo ./setupserver.sh
+ansible-playbook -i inventory.ini setupserver.yml
 ```
+
+> Pastikan kamu memiliki akses SSH ke server dan `python` sudah tersedia di sana.
 
 ---
 
-## ✅ Hasil Setelah Eksekusi
+## 🛡️ Catatan Keamanan
 
-- Sistem telah diperbarui
-- Paket dasar terinstal
-- SNMP & NTP dikonfigurasi dan aktif
-- SSH banner keamanan tampil saat login
-- bash-completion aktif otomatis
+- Pastikan hanya mengatur SNMP dengan akses jaringan terbatas jika menggunakan community string publik.
+- Jangan lupa ubah `ansible_user` jika bukan `root`.
 
 ---
 
-## 👨‍💻 Dibuat oleh
+## 👨‍💻 Pembuat
 
-Chaerul — [chaer.newbie@gmail.com](mailto:chaer.newbie@gmail.com)# playbook-linux
+Chaerul | [chaer.newbie@gmail.com](mailto:chaer.newbie@gmail.com)

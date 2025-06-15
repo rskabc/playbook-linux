@@ -1,0 +1,95 @@
+---
+- name: Setup dan konfigurasi awal server AlmaLinux
+  hosts: all
+  become: true
+  vars:
+    snmp_community: public
+    snmp_location: "Jakarta, Indonesia"
+    snmp_contact: "reski.abuchaer@gmail.com"
+    ntp_servers:
+      - 0.id.pool.ntp.org
+      - 1.id.pool.ntp.org
+
+  tasks:
+    - name: Update sistem dan install paket dasar
+      dnf:
+        name:
+          - htop
+          - nano
+          - tree
+          - curl
+          - wget
+          - net-tools
+          - bind-utils
+          - traceroute
+          - yum-utils
+          - unzip
+          - zip
+          - git
+          - snmp
+          - chrony
+          - bash-completion
+        state: present
+        update_cache: true
+
+    - name: Tambahkan konfigurasi SNMP
+      copy:
+        dest: /etc/snmp/snmpd.conf
+        content: |
+          com2sec readonly  default         {{ snmp_community }}
+          group   MyROGroup v2c             readonly
+          view    all    included  .1                               80
+          access  MyROGroup ""      v2c    noauth  exact  all    none   none
+          syslocation {{ snmp_location }}
+          syscontact {{ snmp_contact }}
+
+    - name: Aktifkan dan jalankan SNMP
+      systemd:
+        name: snmpd
+        enabled: yes
+        state: started
+
+    - name: Ganti server NTP lokal di Chrony
+      lineinfile:
+        path: /etc/chrony.conf
+        regexp: '^pool '
+        line: ""
+        state: absent
+
+    - name: Tambahkan server NTP Indonesia
+      blockinfile:
+        path: /etc/chrony.conf
+        block: |
+          server {{ ntp_servers[0] }} iburst
+          server {{ ntp_servers[1] }} iburst
+
+    - name: Aktifkan dan jalankan chronyd
+      systemd:
+        name: chronyd
+        enabled: yes
+        state: started
+
+    - name: Tambahkan SSH banner
+      copy:
+        dest: /etc/issue.net
+        content: |
+          Peringatan: Akses ke sistem ini diawasi. Segala aktivitas Anda dapat dicatat dan diaudit.
+          Jika Anda tidak berwenang, segera keluar dari sistem ini.
+
+    - name: Aktifkan SSH banner
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?Banner'
+        line: 'Banner /etc/issue.net'
+
+    - name: Restart SSH untuk menerapkan banner
+      systemd:
+        name: sshd
+        state: restarted
+
+    - name: Aktifkan bash-completion di .bashrc
+      lineinfile:
+        path: ~/.bashrc
+        line: "source /etc/profile.d/bash_completion.sh"
+        state: present
+        insertafter: EOF
